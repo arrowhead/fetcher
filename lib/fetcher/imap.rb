@@ -26,6 +26,10 @@ module Fetcher
       super(options)
     end
     
+    def handle_exception(e)
+      puts $!, $@, "\n"
+    end
+
     # Open connection and login to server
     def establish_connection
       timeout_call = (RUBY_VERSION < '1.9.0') ? "SystemTimer.timeout_after(15.seconds) do" : "Timeout::timeout(15) do"
@@ -48,7 +52,8 @@ module Fetcher
         begin
           process_message(msg)
           add_to_processed_folder(uid) if @processed_folder
-        rescue
+        rescue => e
+          handle_exception(e)
           handle_bogus_message(msg)
         end
         # Mark message as deleted 
